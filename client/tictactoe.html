@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic Tac Toe - XO Game</title>
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        /* Container */
+        .container {
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+            padding: 20px;
+        }
+
+        /* Main Menu Styles */
+        .menu {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px 30px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            opacity: 1;
+            transform: scale(1);
+            transition: all 0.3s ease;
+        }
+
+        .menu.hidden {
+            opacity: 0;
+            transform: scale(0.9);
+            pointer-events: none;
+        }
+
+        .menu h1 {
+            color: white;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .menu p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+        }
+
+        /* Button Styles */
+        .menu-button {
+            display: block;
+            width: 100%;
+            padding: 15px 25px;
+            margin: 15px 0;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .menu-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(45deg, #ff5252, #e53e3e);
+        }
+
+        .menu-button:nth-child(4) {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+        }
+
+        .menu-button:nth-child(4):hover {
+            background: linear-gradient(45deg, #45b7aa, #3a8b7f);
+        }
+
+        /* Game Board Styles */
+        .game-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            opacity: 0;
+            transform: scale(0.9);
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+
+        .game-container.active {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: all;
+        }
+
+        /* Player Turn Indicator */
+        .turn-indicator {
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            color: white;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .turn-indicator.red-turn {
+            text-shadow: 0 0 20px #ff6b6b;
+        }
+
+        .turn-indicator.blue-turn {
+            text-shadow: 0 0 20px #4ecdc4;
+        }
+
+        /* Game Board */
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 20px auto;
+            max-width: 300px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .board.red-active {
+            box-shadow: 0 0 30px rgba(255, 107, 107, 0.5);
+        }
+
+        .board.blue-active {
+            box-shadow: 0 0 30px rgba(78, 205, 196, 0.5);
+        }
+
+        /* Board Cells */
+        .cell {
+            aspect-ratio: 1;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 10px;
+            font-size: 2.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cell:hover:not(.taken) {
+            background: rgba(255, 255, 255, 1);
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .cell.taken {
+            cursor: not-allowed;
+        }
+
+        .cell.x {
+            color: #ff6b6b;
+            text-shadow: 2px 2px 4px rgba(255, 107, 107, 0.3);
+        }
+
+        .cell.o {
+            color: #4ecdc4;
+            text-shadow: 2px 2px 4px rgba(78, 205, 196, 0.3);
+        }
+
+        .cell.winning {
+            animation: winningGlow 1s ease-in-out infinite alternate;
+            transform: scale(1.1);
+        }
+
+        @keyframes winningGlow {
+            0% {
+                box-shadow: 0 0 20px rgba(255, 215, 0, 0.7);
+                background: rgba(255, 255, 255, 0.9);
+            }
+            100% {
+                box-shadow: 0 0 40px rgba(255, 215, 0, 1);
+                background: rgba(255, 255, 255, 1);
+            }
+        }
+
+        /* Victory Message */
+        .victory-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 30px 40px;
+            border-radius: 20px;
+            font-size: 2rem;
+            font-weight: bold;
+            text-align: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .victory-message.show {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .victory-message.red {
+            text-shadow: 0 0 30px #ff6b6b;
+            border: 3px solid #ff6b6b;
+        }
+
+        .victory-message.blue {
+            text-shadow: 0 0 30px #4ecdc4;
+            border: 3px solid #4ecdc4;
+        }
+
+        .victory-message.draw {
+            text-shadow: 0 0 30px #ffd700;
+            border: 3px solid #ffd700;
+        }
+
+        /* Back Button */
+        .back-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Loading Indicator for AI */
+        .ai-thinking {
+            margin-top: 15px;
+            color: rgba(255, 255, 255, 0.8);
+            font-style: italic;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .ai-thinking.show {
+            opacity: 1;
+        }
+
+        .ai-thinking::after {
+            content: '';
+            animation: dots 1.5s infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: ''; }
+            40% { content: '.'; }
+            60% { content: '..'; }
+            80%, 100% { content: '...'; }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .menu h1 {
+                font-size: 2rem;
+            }
+            
+            .board {
+                max-width: 250px;
+            }
+            
+            .cell {
+                font-size: 2rem;
+            }
+            
+            .victory-message {
+                padding: 20px 25px;
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Main Menu -->
+        <div class="menu" id="menu">
+            <h1>🎮 Tic Tac Toe</h1>
+            <p>Choose your game mode</p>
+            <button class="menu-button" onclick="startFriendGame()">👥 Play with Friend</button>
+            <button class="menu-button" onclick="startAIGame()">🤖 Play with AI (Gemini)</button>
+        </div>
+
+        <!-- Game Container -->
+        <div class="game-container" id="gameContainer">
+            <div class="turn-indicator" id="turnIndicator">Red's Turn (X)</div>
+            
+            <div class="board" id="board">
+                <button class="cell" onclick="makeMove(0)"></button>
+                <button class="cell" onclick="makeMove(1)"></button>
+                <button class="cell" onclick="makeMove(2)"></button>
+                <button class="cell" onclick="makeMove(3)"></button>
+                <button class="cell" onclick="makeMove(4)"></button>
+                <button class="cell" onclick="makeMove(5)"></button>
+                <button class="cell" onclick="makeMove(6)"></button>
+                <button class="cell" onclick="makeMove(7)"></button>
+                <button class="cell" onclick="makeMove(8)"></button>
+            </div>
+
+            <div class="ai-thinking" id="aiThinking">AI is thinking</div>
+            <button class="back-button" onclick="backToMenu()">← Back to Menu</button>
+        </div>
+
+        <!-- Victory Message -->
+        <div class="victory-message" id="victoryMessage"></div>
+    </div>
+
+    <script>
+        // Game State Variables
+        let board = ['', '', '', '', '', '', '', '', ''];
+        let currentPlayer = 'X';
+        let gameMode = ''; // 'friend' or 'ai'
+        let gameActive = true;
+        let isAITurn = false;
+
+        // Game Elements
+        const menu = document.getElementById('menu');
+        const gameContainer = document.getElementById('gameContainer');
+        const boardElement = document.getElementById('board');
+        const turnIndicator = document.getElementById('turnIndicator');
+        const victoryMessage = document.getElementById('victoryMessage');
+        const aiThinking = document.getElementById('aiThinking');
+        const cells = document.querySelectorAll('.cell');
+
+        // Winning Combinations
+        const winningCombinations = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
+            [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
+            [0, 4, 8], [2, 4, 6] // Diagonals
+        ];
+
+        /**
+         * Start Friend vs Friend Game Mode
+         */
+        function startFriendGame() {
+            gameMode = 'friend';
+            initializeGame();
+        }
+
+        /**
+         * Start AI vs Player Game Mode
+         */
+        function startAIGame() {
+            gameMode = 'ai';
+            initializeGame();
+        }
+
+        /**
+         * Initialize Game Board and Settings
+         */
+        function initializeGame() {
+            // Reset game state
+            board = ['', '', '', '', '', '', '', '', ''];
+            gameActive = true;
+            isAITurn = false;
+
+            // Randomly choose who starts first
+            currentPlayer = Math.random() < 0.5 ? 'X' : 'O';
+            
+            // Clear board display
+            cells.forEach(cell => {
+                cell.textContent = '';
+                cell.className = 'cell';
+            });
+
+            // Hide menu, show game
+            menu.classList.add('hidden');
+            setTimeout(() => {
+                gameContainer.classList.add('active');
+            }, 300);
+
+            // Update turn indicator and board glow
+            updateTurnDisplay();
+
+            // If AI mode and AI starts first (X), make AI move
+            if (gameMode === 'ai' && currentPlayer === 'X') {
+                setTimeout(() => {
+                    makeAIMove();
+                }, 1000);
+            }
+
+            console.log(`Game started in ${gameMode} mode. ${currentPlayer} goes first.`);
+        }
+
+        /**
+         * Handle Player Move
+         */
+        function makeMove(index) {
+            // Prevent moves during AI turn or if game is inactive
+            if (!gameActive || isAITurn || board[index] !== '') {
+                return;
+            }
+
+            // Make the move
+            board[index] = currentPlayer;
+            cells[index].textContent = currentPlayer;
+            cells[index].classList.add('taken', currentPlayer.toLowerCase());
+
+            console.log(`Player ${currentPlayer} moved to position ${index}`);
+
+            // Check for win or draw
+            if (checkWin()) {
+                handleGameEnd();
+                return;
+            }
+
+            if (checkDraw()) {
+                handleDraw();
+                return;
+            }
+
+            // Switch turns
+            switchTurns();
+
+            // If AI mode and now it's AI turn, make AI move
+            if (gameMode === 'ai' && shouldAIMove()) {
+                setTimeout(() => {
+                    makeAIMove();
+                }, 800);
+            }
+        }
+
+        /**
+         * Determine if AI should make a move
+         */
+        function shouldAIMove() {
+            return (currentPlayer === 'X'); // AI is always X
+        }
+
+        /**
+         * Make AI Move using Gemini API
+         */
+        async function makeAIMove() {
+            if (!gameActive) return;
+
+            isAITurn = true;
+            aiThinking.classList.add('show');
+
+            try {
+                // Get AI move from Gemini
+                const aiMove = await getGeminiMove();
+                
+                if (aiMove !== -1 && board[aiMove] === '') {
+                    // Make AI move
+                    board[aiMove] = currentPlayer;
+                    cells[aiMove].textContent = currentPlayer;
+                    cells[aiMove].classList.add('taken', currentPlayer.toLowerCase());
+
+                    console.log(`AI moved to position ${aiMove}`);
+
+                    // Check for win or draw
+                    if (checkWin()) {
+                        handleGameEnd();
+                        return;
+                    }
+
+                    if (checkDraw()) {
+                        handleDraw();
+                        return;
+                    }
+
+                    // Switch turns
+                    switchTurns();
+                } else {
+                    console.error('AI returned invalid move:', aiMove);
+                    // Fallback to random move
+                    makeRandomAIMove();
+                }
+            } catch (error) {
+                console.error('Error getting AI move:', error);
+                // Fallback to random move
+                makeRandomAIMove();
+            } finally {
+                isAITurn = false;
+                aiThinking.classList.remove('show');
+            }
+        }
+
+        /**
+         * Get AI Move from Gemini API
+         */
+        async function getGeminiMove() {
+            const apiKey = process.env.GEMINI_API_KEY || 'default_key';
+            
+            // Convert board to display format for AI
+            const boardForAI = board.map(cell => cell === '' ? '_' : cell);
+            
+            const prompt = `You are playing Tic Tac Toe as X. The current board is [${boardForAI.join(', ')}]. Return the best next move index (0-8) as a single number. Only respond with the number, no other text.`;
+
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{
+                                text: prompt
+                            }]
+                        }],
+                        generationConfig: {
+                            temperature: 0.7,
+                            maxOutputTokens: 10
+                        }
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const aiResponse = data.candidates[0].content.parts[0].text.trim();
+                const move = parseInt(aiResponse);
+
+                // Validate move
+                if (isNaN(move) || move < 0 || move > 8 || board[move] !== '') {
+                    throw new Error('Invalid AI move: ' + move);
+                }
+
+                return move;
+            } catch (error) {
+                console.error('Gemini API error:', error);
+                throw error;
+            }
+        }
+
+        /**
+         * Fallback Random AI Move
+         */
+        function makeRandomAIMove() {
+            const availableMoves = board.map((cell, index) => cell === '' ? index : null)
+                                      .filter(index => index !== null);
+            
+            if (availableMoves.length > 0) {
+                const randomMove = availableMoves[Math.floor(Math.random() * availableMoves.length)];
+                
+                board[randomMove] = currentPlayer;
+                cells[randomMove].textContent = currentPlayer;
+                cells[randomMove].classList.add('taken', currentPlayer.toLowerCase());
+
+                console.log(`AI made random move to position ${randomMove}`);
+
+                // Check for win or draw
+                if (checkWin()) {
+                    handleGameEnd();
+                    return;
+                }
+
+                if (checkDraw()) {
+                    handleDraw();
+                    return;
+                }
+
+                // Switch turns
+                switchTurns();
+            }
+        }
+
+        /**
+         * Switch Player Turns
+         */
+        function switchTurns() {
+            currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+            updateTurnDisplay();
+        }
+
+        /**
+         * Update Turn Display and Board Glow
+         */
+        function updateTurnDisplay() {
+            const playerName = gameMode === 'ai' ? 
+                (currentPlayer === 'X' ? 'AI' : 'You') :
+                (currentPlayer === 'X' ? 'Red' : 'Blue');
+            
+            const symbol = `(${currentPlayer})`;
+            turnIndicator.textContent = `${playerName}'s Turn ${symbol}`;
+
+            // Update turn indicator glow
+            turnIndicator.className = 'turn-indicator';
+            if (currentPlayer === 'X') {
+                turnIndicator.classList.add('red-turn');
+                boardElement.className = 'board red-active';
+            } else {
+                turnIndicator.classList.add('blue-turn');
+                boardElement.className = 'board blue-active';
+            }
+        }
+
+        /**
+         * Check for Win Condition
+         */
+        function checkWin() {
+            for (let combination of winningCombinations) {
+                const [a, b, c] = combination;
+                if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+                    // Highlight winning cells
+                    cells[a].classList.add('winning');
+                    cells[b].classList.add('winning');
+                    cells[c].classList.add('winning');
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /**
+         * Check for Draw Condition
+         */
+        function checkDraw() {
+            return board.every(cell => cell !== '');
+        }
+
+        /**
+         * Handle Game End (Win)
+         */
+        function handleGameEnd() {
+            gameActive = false;
+            
+            let winnerText = '';
+            let messageClass = '';
+
+            if (gameMode === 'friend') {
+                if (currentPlayer === 'X') {
+                    winnerText = '🔴 Red Won!';
+                    messageClass = 'red';
+                } else {
+                    winnerText = '🔵 Blue Won!';
+                    messageClass = 'blue';
+                }
+            } else {
+                if (currentPlayer === 'X') {
+                    winnerText = '🤖 AI Wins!';
+                    messageClass = 'red';
+                } else {
+                    winnerText = '🎉 You Win!';
+                    messageClass = 'blue';
+                }
+            }
+
+            showVictoryMessage(winnerText, messageClass);
+            console.log(`Game ended: ${winnerText}`);
+        }
+
+        /**
+         * Handle Draw
+         */
+        function handleDraw() {
+            gameActive = false;
+            showVictoryMessage('🤝 Draw!', 'draw');
+            console.log('Game ended in a draw');
+        }
+
+        /**
+         * Show Victory Message with Animation
+         */
+        function showVictoryMessage(text, className) {
+            victoryMessage.textContent = text;
+            victoryMessage.className = `victory-message ${className}`;
+            
+            // Show victory message after winning line highlight
+            setTimeout(() => {
+                victoryMessage.classList.add('show');
+            }, 2000);
+
+            // Auto return to menu after 3 more seconds
+            setTimeout(() => {
+                backToMenu();
+            }, 5000);
+        }
+
+        /**
+         * Return to Main Menu
+         */
+        function backToMenu() {
+            // Hide victory message
+            victoryMessage.classList.remove('show');
+            
+            // Hide game container
+            gameContainer.classList.remove('active');
+            
+            // Show menu after transition
+            setTimeout(() => {
+                menu.classList.remove('hidden');
+                
+                // Reset board glow
+                boardElement.className = 'board';
+                
+                // Clear any winning highlights
+                cells.forEach(cell => {
+                    cell.classList.remove('winning');
+                });
+            }, 300);
+
+            console.log('Returned to main menu');
+        }
+
+        // Initialize the game on page load
+        console.log('Tic Tac Toe game loaded successfully');
+    </script>
+</body>
+</html>
