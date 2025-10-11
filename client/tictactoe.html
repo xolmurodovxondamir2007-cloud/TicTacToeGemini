@@ -511,6 +511,7 @@
 
         const moveSound = new Audio('/sounds/hit.mp3');
         const winSound = new Audio('/sounds/success.mp3');
+        const drawSound = new Audio('/sounds/background.mp3');
 
         loadSettings();
 
@@ -818,6 +819,7 @@
 
         async function handleDraw() {
             gameActive = false;
+            playSound(drawSound);
             await saveGameData('draw');
             showVictoryMessage('🤝 Draw!', 'draw');
         }
