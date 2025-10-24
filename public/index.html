@@ -28,7 +28,7 @@
             padding: 20px;
         }
 
-        .menu, .game-container, .settings-panel, .leaderboard-panel, .history-panel {
+        .menu, .game-container, .settings-panel {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
             border-radius: 20px;
@@ -44,7 +44,7 @@
             max-width: 500px;
         }
 
-        .menu.active, .game-container.active, .settings-panel.active, .leaderboard-panel.active, .history-panel.active {
+        .menu.active, .game-container.active, .settings-panel.active {
             opacity: 1;
             transform: scale(1);
             pointer-events: all;
@@ -130,53 +130,52 @@
 
         .cell {
             aspect-ratio: 1;
-            background: rgba(255, 255, 255, 0.9);
-            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
             border-radius: 10px;
-            font-size: 2.5rem;
+            font-size: 3rem;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
         .cell:hover:not(.taken) {
-            background: rgba(255, 255, 255, 1);
+            background: rgba(255, 255, 255, 0.2);
             transform: scale(1.05);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
         }
 
         .cell.taken {
             cursor: not-allowed;
         }
 
-        .cell.x {
+        .cell.X {
             color: var(--player1-color, #ff6b6b);
-            text-shadow: 2px 2px 4px rgba(255, 107, 107, 0.3);
+            text-shadow: 0 0 10px var(--player1-color, #ff6b6b);
+            animation: popIn 0.3s ease;
         }
 
-        .cell.o {
+        .cell.O {
             color: var(--player2-color, #4ecdc4);
-            text-shadow: 2px 2px 4px rgba(78, 205, 196, 0.3);
+            text-shadow: 0 0 10px var(--player2-color, #4ecdc4);
+            animation: popIn 0.3s ease;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); opacity: 1; }
         }
 
         .cell.winning {
-            animation: winningGlow 1s ease-in-out infinite alternate;
-            transform: scale(1.1);
+            animation: winPulse 0.6s ease infinite;
         }
 
-        @keyframes winningGlow {
-            0% {
-                box-shadow: 0 0 20px rgba(255, 215, 0, 0.7);
-                background: rgba(255, 255, 255, 0.9);
-            }
-            100% {
-                box-shadow: 0 0 40px rgba(255, 215, 0, 1);
-                background: rgba(255, 255, 255, 1);
-            }
+        @keyframes winPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
         }
 
         .victory-message {
@@ -186,97 +185,60 @@
             transform: translate(-50%, -50%) scale(0);
             background: rgba(0, 0, 0, 0.9);
             color: white;
-            padding: 30px 40px;
+            padding: 40px 60px;
             border-radius: 20px;
             font-size: 2rem;
             font-weight: bold;
             text-align: center;
             z-index: 1000;
             opacity: 0;
-            transition: all 0.3s ease;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            transition: all 0.4s ease;
+            box-shadow: 0 0 50px rgba(255, 255, 255, 0.3);
         }
 
         .victory-message.show {
-            opacity: 1;
             transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
         }
 
-        .victory-message.red {
-            text-shadow: 0 0 30px #ff6b6b;
-            border: 3px solid #ff6b6b;
+        .victory-message.win-red {
+            border: 3px solid var(--player1-color, #ff6b6b);
+            box-shadow: 0 0 50px var(--player1-color, #ff6b6b);
         }
 
-        .victory-message.blue {
-            text-shadow: 0 0 30px #4ecdc4;
-            border: 3px solid #4ecdc4;
+        .victory-message.win-blue {
+            border: 3px solid var(--player2-color, #4ecdc4);
+            box-shadow: 0 0 50px var(--player2-color, #4ecdc4);
         }
 
         .victory-message.draw {
-            text-shadow: 0 0 30px #ffd700;
-            border: 3px solid #ffd700;
-        }
-
-        .back-button {
-            margin-top: 15px;
-            padding: 10px 20px;
-            background: rgba(255, 255, 255, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            font-size: 0.95rem;
-        }
-
-        .back-button:hover {
-            background: rgba(255, 255, 255, 0.3);
-        }
-
-        .ai-thinking {
-            margin-top: 10px;
-            color: rgba(255, 255, 255, 0.8);
-            font-style: italic;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .ai-thinking.show {
-            opacity: 1;
-        }
-
-        .ai-thinking::after {
-            content: '';
-            animation: dots 1.5s infinite;
-        }
-
-        @keyframes dots {
-            0%, 20% { content: ''; }
-            40% { content: '.'; }
-            60% { content: '..'; }
-            80%, 100% { content: '...'; }
+            border: 3px solid #feca57;
+            box-shadow: 0 0 50px #feca57;
         }
 
         .difficulty-selector {
-            margin: 15px 0;
+            margin-bottom: 20px;
+            display: none;
         }
 
-        .difficulty-selector label {
+        .difficulty-selector.show {
             display: block;
-            color: white;
-            margin-bottom: 8px;
-            font-weight: bold;
         }
 
-        .difficulty-buttons {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
+        .difficulty-selector p {
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 10px;
+            font-size: 1rem;
         }
 
         .difficulty-btn {
-            flex: 1;
-            padding: 8px 12px;
+            display: inline-block;
+            padding: 8px 20px;
+            margin: 5px;
             background: rgba(255, 255, 255, 0.2);
             color: white;
             border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 10px;
+            border-radius: 25px;
             cursor: pointer;
             transition: all 0.3s ease;
             font-size: 0.9rem;
@@ -284,53 +246,50 @@
 
         .difficulty-btn:hover {
             background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
         }
 
-        .difficulty-btn.active {
+        .difficulty-btn.selected {
             background: linear-gradient(45deg, #4ecdc4, #44a08d);
             border-color: #4ecdc4;
+            box-shadow: 0 4px 15px rgba(78, 205, 196, 0.4);
         }
 
-        .leaderboard-list, .history-list {
-            max-height: 400px;
-            overflow-y: auto;
-            margin-top: 15px;
+        .ai-thinking {
+            margin-top: 10px;
+            color: rgba(255, 255, 255, 0.7);
+            font-style: italic;
+            display: none;
+            animation: pulse 1.5s ease infinite;
         }
 
-        .leaderboard-item, .history-item {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 12px;
-            margin: 8px 0;
-            border-radius: 10px;
-            color: white;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
         }
 
-        .leaderboard-item:hover, .history-item:hover {
-            background: rgba(255, 255, 255, 0.2);
-            cursor: pointer;
+        .ai-thinking.show {
+            display: block;
         }
 
         .form-group {
-            margin: 15px 0;
+            margin: 20px 0;
             text-align: left;
         }
 
         .form-group label {
             display: block;
             color: white;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             font-weight: bold;
         }
 
         .form-group input {
             width: 100%;
             padding: 10px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.2);
             color: white;
             font-size: 1rem;
         }
@@ -342,7 +301,8 @@
         .color-picker {
             display: flex;
             gap: 10px;
-            margin-top: 8px;
+            justify-content: center;
+            margin-top: 10px;
         }
 
         .color-option {
@@ -360,29 +320,19 @@
 
         .color-option.selected {
             border-color: white;
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
         }
 
-        @media (max-width: 480px) {
-            .container {
-                padding: 15px;
-            }
-            
+        @media (max-width: 500px) {
             .menu h1 {
                 font-size: 2rem;
             }
-            
-            .board {
-                max-width: 250px;
-            }
-            
             .cell {
-                font-size: 2rem;
+                font-size: 2.5rem;
             }
-            
             .victory-message {
-                padding: 20px 25px;
                 font-size: 1.5rem;
+                padding: 30px 40px;
             }
         }
     </style>
@@ -391,37 +341,22 @@
     <div class="container">
         <div class="menu active" id="menu">
             <h1>🎮 Tic Tac Toe</h1>
-            <p>Choose your game mode</p>
-            <button class="menu-button" onclick="startFriendGame()">👥 Play with Friend</button>
-            <button class="menu-button" onclick="startAIGame()">🤖 Play with AI (Gemini)</button>
-            <button class="menu-button secondary" onclick="showLeaderboard()">🏆 Leaderboard</button>
-            <button class="menu-button secondary" onclick="showHistory()">📜 Game History</button>
+            <p>Red (X) vs Blue (O)</p>
+            <button class="menu-button" onclick="startGame('friend')">👥 Play with Friend</button>
+            <button class="menu-button" onclick="startGame('ai')">🤖 Play with AI (Gemini)</button>
             <button class="menu-button secondary" onclick="showSettings()">⚙️ Settings</button>
         </div>
 
         <div class="game-container" id="gameContainer">
-            <div class="turn-indicator" id="turnIndicator">Red's Turn (X)</div>
-            
-            <div class="difficulty-selector" id="difficultySelector" style="display:none;">
-                <label>AI Difficulty:</label>
-                <div class="difficulty-buttons">
-                    <button class="difficulty-btn" onclick="setDifficulty('easy')">Easy</button>
-                    <button class="difficulty-btn active" onclick="setDifficulty('medium')">Medium</button>
-                    <button class="difficulty-btn" onclick="setDifficulty('hard')">Hard</button>
-                </div>
+            <div class="difficulty-selector" id="difficultySelector">
+                <p>Select AI Difficulty:</p>
+                <button class="difficulty-btn" onclick="setDifficulty('easy')">Easy</button>
+                <button class="difficulty-btn selected" onclick="setDifficulty('medium')">Medium</button>
+                <button class="difficulty-btn" onclick="setDifficulty('hard')">Hard</button>
             </div>
 
-            <div class="board" id="board">
-                <button class="cell" onclick="makeMove(0)"></button>
-                <button class="cell" onclick="makeMove(1)"></button>
-                <button class="cell" onclick="makeMove(2)"></button>
-                <button class="cell" onclick="makeMove(3)"></button>
-                <button class="cell" onclick="makeMove(4)"></button>
-                <button class="cell" onclick="makeMove(5)"></button>
-                <button class="cell" onclick="makeMove(6)"></button>
-                <button class="cell" onclick="makeMove(7)"></button>
-                <button class="cell" onclick="makeMove(8)"></button>
-            </div>
+            <div class="turn-indicator" id="turnIndicator"></div>
+            <div class="board" id="board"></div>
 
             <div class="ai-thinking" id="aiThinking">AI is thinking</div>
             <button class="back-button" onclick="backToMenu()">← Back to Menu</button>
@@ -459,22 +394,6 @@
             <button class="back-button" onclick="backToMenu()">← Back</button>
         </div>
 
-        <div class="leaderboard-panel" id="leaderboardPanel">
-            <h2 style="color: white; margin-bottom: 20px;">🏆 Leaderboard</h2>
-            <div class="leaderboard-list" id="leaderboardList">
-                <p style="color: rgba(255,255,255,0.7);">Loading...</p>
-            </div>
-            <button class="back-button" onclick="backToMenu()">← Back</button>
-        </div>
-
-        <div class="history-panel" id="historyPanel">
-            <h2 style="color: white; margin-bottom: 20px;">📜 Game History</h2>
-            <div class="history-list" id="historyList">
-                <p style="color: rgba(255,255,255,0.7);">Loading...</p>
-            </div>
-            <button class="back-button" onclick="backToMenu()">← Back</button>
-        </div>
-
         <div class="victory-message" id="victoryMessage"></div>
     </div>
 
@@ -485,7 +404,6 @@
         let gameActive = true;
         let isAITurn = false;
         let difficulty = 'medium';
-        let gameMoves = [];
         let settings = {
             player1: { name: 'Player 1', color: '#ff6b6b' },
             player2: { name: 'Player 2', color: '#4ecdc4' }
@@ -497,11 +415,8 @@
         const turnIndicator = document.getElementById('turnIndicator');
         const victoryMessage = document.getElementById('victoryMessage');
         const aiThinking = document.getElementById('aiThinking');
-        const cells = document.querySelectorAll('.cell');
         const difficultySelector = document.getElementById('difficultySelector');
         const settingsPanel = document.getElementById('settingsPanel');
-        const leaderboardPanel = document.getElementById('leaderboardPanel');
-        const historyPanel = document.getElementById('historyPanel');
 
         const winningCombinations = [
             [0, 1, 2], [3, 4, 5], [6, 7, 8],
@@ -524,16 +439,33 @@
             const saved = localStorage.getItem('tictactoe_settings');
             if (saved) {
                 settings = JSON.parse(saved);
-                document.getElementById('player1Name').value = settings.player1.name;
-                document.getElementById('player2Name').value = settings.player2.name;
-                updateColorSelection();
+                applySettings();
             }
-            applyColors();
         }
 
-        function applyColors() {
+        function applySettings() {
             document.documentElement.style.setProperty('--player1-color', settings.player1.color);
             document.documentElement.style.setProperty('--player2-color', settings.player2.color);
+        }
+
+        function showSettings() {
+            showPanel(settingsPanel);
+            document.getElementById('player1Name').value = settings.player1.name;
+            document.getElementById('player2Name').value = settings.player2.name;
+
+            document.querySelectorAll('#player1ColorPicker .color-option').forEach(opt => {
+                opt.classList.toggle('selected', opt.style.background === `rgb(${hexToRgb(settings.player1.color)})`);
+            });
+            document.querySelectorAll('#player2ColorPicker .color-option').forEach(opt => {
+                opt.classList.toggle('selected', opt.style.background === `rgb(${hexToRgb(settings.player2.color)})`);
+            });
+        }
+
+        function hexToRgb(hex) {
+            const r = parseInt(hex.slice(1, 3), 16);
+            const g = parseInt(hex.slice(3, 5), 16);
+            const b = parseInt(hex.slice(5, 7), 16);
+            return `${r}, ${g}, ${b}`;
         }
 
         function selectColor(player, color) {
@@ -542,167 +474,104 @@
                 opt.classList.remove('selected');
             });
             event.target.classList.add('selected');
-            settings[`player${player}`].color = color;
-        }
 
-        function updateColorSelection() {
-            document.querySelectorAll('#player1ColorPicker .color-option').forEach(opt => {
-                opt.classList.toggle('selected', opt.style.background === settings.player1.color);
-            });
-            document.querySelectorAll('#player2ColorPicker .color-option').forEach(opt => {
-                opt.classList.toggle('selected', opt.style.background === settings.player2.color);
-            });
+            if (player === 1) {
+                settings.player1.color = color;
+            } else {
+                settings.player2.color = color;
+            }
         }
 
         function saveSettings() {
             settings.player1.name = document.getElementById('player1Name').value || 'Player 1';
             settings.player2.name = document.getElementById('player2Name').value || 'Player 2';
             localStorage.setItem('tictactoe_settings', JSON.stringify(settings));
-            applyColors();
-            alert('Settings saved!');
+            applySettings();
+            backToMenu();
         }
 
         function showPanel(panel) {
-            [menu, gameContainer, settingsPanel, leaderboardPanel, historyPanel].forEach(p => {
+            [menu, gameContainer, settingsPanel].forEach(p => {
                 p.classList.remove('active');
             });
             panel.classList.add('active');
         }
 
-        function showSettings() {
-            showPanel(settingsPanel);
-        }
+        function startGame(mode) {
+            gameMode = mode;
+            board = ['', '', '', '', '', '', '', '', ''];
+            gameActive = true;
+            isAITurn = false;
+            currentPlayer = Math.random() < 0.5 ? 'X' : 'O';
 
-        async function showLeaderboard() {
-            showPanel(leaderboardPanel);
-            try {
-                const res = await fetch('/api/leaderboard');
-                const data = await res.json();
-                const list = document.getElementById('leaderboardList');
-                if (data.length === 0) {
-                    list.innerHTML = '<p style="color: rgba(255,255,255,0.7);">No games played yet</p>';
-                } else {
-                    list.innerHTML = data.map((p, i) => `
-                        <div class="leaderboard-item">
-                            <span>${i + 1}. ${p.name}</span>
-                            <span>W: ${p.wins} L: ${p.losses} D: ${p.draws}</span>
-                        </div>
-                    `).join('');
-                }
-            } catch (e) {
-                document.getElementById('leaderboardList').innerHTML = '<p style="color: rgba(255,255,255,0.7);">Error loading leaderboard</p>';
-            }
-        }
+            difficultySelector.classList.toggle('show', mode === 'ai');
+            renderBoard();
+            updateTurnIndicator();
+            showPanel(gameContainer);
 
-        async function showHistory() {
-            showPanel(historyPanel);
-            try {
-                const res = await fetch('/api/game-history');
-                const data = await res.json();
-                const list = document.getElementById('historyList');
-                if (data.length === 0) {
-                    list.innerHTML = '<p style="color: rgba(255,255,255,0.7);">No games played yet</p>';
-                } else {
-                    list.innerHTML = data.map(g => `
-                        <div class="history-item" onclick="replayGame(${g.id})">
-                            <div>
-                                <div>${g.player1Name} vs ${g.player2Name}</div>
-                                <div style="font-size: 0.85rem; opacity: 0.7;">${new Date(g.playedAt).toLocaleDateString()}</div>
-                            </div>
-                            <span>${g.winner || 'Draw'}</span>
-                        </div>
-                    `).join('');
-                }
-            } catch (e) {
-                document.getElementById('historyList').innerHTML = '<p style="color: rgba(255,255,255,0.7);">Error loading history</p>';
-            }
-        }
-
-        async function replayGame(id) {
-            try {
-                const res = await fetch(`/api/game/${id}`);
-                const game = await res.json();
-                showPanel(gameContainer);
-                difficultySelector.style.display = 'none';
-                board = [...game.finalBoard];
-                gameActive = false;
-                cells.forEach((cell, i) => {
-                    cell.textContent = board[i];
-                    cell.className = 'cell';
-                    if (board[i]) {
-                        cell.classList.add('taken', board[i].toLowerCase());
-                    }
-                });
-                checkWin();
-            } catch (e) {
-                alert('Error loading game replay');
+            if (mode === 'ai' && currentPlayer === 'X') {
+                setTimeout(() => makeAIMove(), 500);
             }
         }
 
         function setDifficulty(level) {
             difficulty = level;
             document.querySelectorAll('.difficulty-btn').forEach(btn => {
-                btn.classList.remove('active');
+                btn.classList.remove('selected');
             });
-            event.target.classList.add('active');
+            event.target.classList.add('selected');
         }
 
-        function startFriendGame() {
-            gameMode = 'friend';
-            difficultySelector.style.display = 'none';
-            initializeGame();
-        }
-
-        function startAIGame() {
-            gameMode = 'ai';
-            difficultySelector.style.display = 'block';
-            initializeGame();
-        }
-
-        function initializeGame() {
-            board = ['', '', '', '', '', '', '', '', ''];
-            gameActive = true;
-            isAITurn = false;
-            gameMoves = [];
-            currentPlayer = Math.random() < 0.5 ? 'X' : 'O';
-            
-            cells.forEach(cell => {
-                cell.textContent = '';
-                cell.className = 'cell';
+        function renderBoard() {
+            boardElement.innerHTML = '';
+            board.forEach((cell, index) => {
+                const cellElement = document.createElement('div');
+                cellElement.className = 'cell';
+                if (cell) {
+                    cellElement.textContent = cell;
+                    cellElement.classList.add('taken', cell);
+                }
+                cellElement.addEventListener('click', () => handleCellClick(index));
+                boardElement.appendChild(cellElement);
             });
 
-            showPanel(gameContainer);
-            updateTurnDisplay();
-
-            if (gameMode === 'ai' && currentPlayer === 'X') {
-                setTimeout(() => makeAIMove(), 1000);
+            boardElement.classList.remove('red-active', 'blue-active');
+            if (gameActive) {
+                boardElement.classList.add(currentPlayer === 'X' ? 'red-active' : 'blue-active');
             }
+        }
+
+        function handleCellClick(index) {
+            if (!gameActive || board[index] !== '' || isAITurn) return;
+
+            makeMove(index);
         }
 
         function makeMove(index) {
-            if (!gameActive || isAITurn || board[index] !== '') return;
-
             board[index] = currentPlayer;
-            cells[index].textContent = currentPlayer;
-            cells[index].classList.add('taken', currentPlayer.toLowerCase());
-            gameMoves.push({ player: currentPlayer, index, timestamp: Date.now() });
             playSound(moveSound);
+            renderBoard();
 
-            if (checkWin()) {
-                handleGameEnd();
-                return;
+            const winner = checkWinner();
+            if (winner) {
+                endGame(winner);
+            } else if (board.every(cell => cell !== '')) {
+                endGame('draw');
+            } else {
+                currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+                updateTurnIndicator();
+
+                if (gameMode === 'ai' && currentPlayer === 'X') {
+                    setTimeout(() => makeAIMove(), 300);
+                }
             }
+        }
 
-            if (checkDraw()) {
-                handleDraw();
-                return;
-            }
-
-            switchTurns();
-
-            if (gameMode === 'ai' && currentPlayer === 'X') {
-                setTimeout(() => makeAIMove(), 800);
-            }
+        function updateTurnIndicator() {
+            const playerName = currentPlayer === 'X' ? settings.player1.name : settings.player2.name;
+            const playerSymbol = currentPlayer;
+            turnIndicator.textContent = `${playerName}'s Turn (${playerSymbol})`;
+            turnIndicator.className = 'turn-indicator ' + (currentPlayer === 'X' ? 'red-turn' : 'blue-turn');
         }
 
         async function makeAIMove() {
@@ -712,163 +581,78 @@
             aiThinking.classList.add('show');
 
             try {
-                const res = await fetch('/api/ai-move', {
+                const response = await fetch('/api/ai-move', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ board, difficulty })
                 });
-                const data = await res.json();
-                const move = data.move;
 
-                if (move !== undefined && board[move] === '') {
-                    board[move] = currentPlayer;
-                    cells[move].textContent = currentPlayer;
-                    cells[move].classList.add('taken', currentPlayer.toLowerCase());
-                    gameMoves.push({ player: currentPlayer, index: move, timestamp: Date.now() });
-                    playSound(moveSound);
+                const data = await response.json();
 
-                    if (checkWin()) {
-                        handleGameEnd();
-                        return;
+                setTimeout(() => {
+                    aiThinking.classList.remove('show');
+                    if (data.move !== undefined && board[data.move] === '') {
+                        makeMove(data.move);
                     }
-
-                    if (checkDraw()) {
-                        handleDraw();
-                        return;
-                    }
-
-                    switchTurns();
-                }
-            } catch (e) {
-                console.error('AI move error:', e);
-            } finally {
-                isAITurn = false;
+                    isAITurn = false;
+                }, 500);
+            } catch (error) {
+                console.error('AI move error:', error);
                 aiThinking.classList.remove('show');
+                isAITurn = false;
             }
         }
 
-        function switchTurns() {
-            currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
-            updateTurnDisplay();
-        }
-
-        function updateTurnDisplay() {
-            let playerName;
-            if (gameMode === 'ai') {
-                playerName = currentPlayer === 'X' ? 'AI' : settings.player2.name;
-            } else {
-                playerName = currentPlayer === 'X' ? settings.player1.name : settings.player2.name;
-            }
-            
-            turnIndicator.textContent = `${playerName}'s Turn (${currentPlayer})`;
-            turnIndicator.className = 'turn-indicator';
-            
-            if (currentPlayer === 'X') {
-                turnIndicator.classList.add('red-turn');
-                boardElement.className = 'board red-active';
-            } else {
-                turnIndicator.classList.add('blue-turn');
-                boardElement.className = 'board blue-active';
-            }
-        }
-
-        function checkWin() {
-            for (let combo of winningCombinations) {
+        function checkWinner() {
+            for (const combo of winningCombinations) {
                 const [a, b, c] = combo;
                 if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-                    cells[a].classList.add('winning');
-                    cells[b].classList.add('winning');
-                    cells[c].classList.add('winning');
-                    return true;
+                    highlightWinningCells([a, b, c]);
+                    return board[a];
                 }
             }
-            return false;
+            return null;
         }
 
-        function checkDraw() {
-            return board.every(cell => cell !== '');
+        function highlightWinningCells(cells) {
+            const cellElements = boardElement.querySelectorAll('.cell');
+            cells.forEach(index => {
+                cellElements[index].classList.add('winning');
+            });
         }
 
-        async function handleGameEnd() {
+        function endGame(result) {
             gameActive = false;
-            playSound(winSound);
-            
-            let winnerText = '';
+            boardElement.classList.remove('red-active', 'blue-active');
+
+            let message = '';
             let messageClass = '';
-            let winnerName = '';
 
-            if (gameMode === 'friend') {
-                winnerName = currentPlayer === 'X' ? settings.player1.name : settings.player2.name;
-                winnerText = currentPlayer === 'X' ? '🔴 ' + winnerName + ' Won!' : '🔵 ' + winnerName + ' Won!';
-                messageClass = currentPlayer === 'X' ? 'red' : 'blue';
+            if (result === 'draw') {
+                message = "It's a Draw! 🤝";
+                messageClass = 'draw';
+                playSound(drawSound);
             } else {
-                if (currentPlayer === 'X') {
-                    winnerText = '🤖 AI Wins!';
-                    winnerName = 'AI';
-                    messageClass = 'red';
-                } else {
-                    winnerText = '🎉 You Win!';
-                    winnerName = settings.player2.name;
-                    messageClass = 'blue';
-                }
+                const winnerName = result === 'X' ? settings.player1.name : settings.player2.name;
+                message = `${winnerName} Wins! 🎉`;
+                messageClass = result === 'X' ? 'win-red' : 'win-blue';
+                playSound(winSound);
             }
 
-            await saveGameData(winnerName);
-            showVictoryMessage(winnerText, messageClass);
-        }
-
-        async function handleDraw() {
-            gameActive = false;
-            playSound(drawSound);
-            await saveGameData('draw');
-            showVictoryMessage('🤝 Draw!', 'draw');
-        }
-
-        async function saveGameData(winner) {
-            try {
-                const gameData = {
-                    gameMode,
-                    difficulty: gameMode === 'ai' ? difficulty : null,
-                    player1Name: gameMode === 'friend' ? settings.player1.name : 'AI',
-                    player2Name: gameMode === 'friend' ? settings.player2.name : settings.player2.name,
-                    winner: winner === 'draw' ? null : winner,
-                    moves: gameMoves,
-                    finalBoard: board
-                };
-                await fetch('/api/save-game', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(gameData)
-                });
-            } catch (e) {
-                console.error('Error saving game:', e);
-            }
-        }
-
-        function showVictoryMessage(text, className) {
-            victoryMessage.textContent = text;
-            victoryMessage.className = `victory-message ${className}`;
-            
-            setTimeout(() => {
-                victoryMessage.classList.add('show');
-            }, 2000);
+            victoryMessage.textContent = message;
+            victoryMessage.className = `victory-message show ${messageClass}`;
 
             setTimeout(() => {
-                backToMenu();
-            }, 5000);
+                victoryMessage.classList.remove('show');
+                setTimeout(backToMenu, 300);
+            }, 3000);
         }
 
         function backToMenu() {
-            victoryMessage.classList.remove('show');
-            [gameContainer, settingsPanel, leaderboardPanel, historyPanel].forEach(p => {
+            [gameContainer, settingsPanel].forEach(p => {
                 p.classList.remove('active');
             });
-            
-            setTimeout(() => {
-                menu.classList.add('active');
-                boardElement.className = 'board';
-                cells.forEach(cell => cell.classList.remove('winning'));
-            }, 300);
+            menu.classList.add('active');
         }
     </script>
 </body>

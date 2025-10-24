@@ -1,6 +1,6 @@
 # 🎮 Tic Tac Toe with Gemini AI
 
-A modern, full-featured Tic Tac Toe game with AI opponent powered by Google's Gemini AI. Built with vanilla JavaScript, Express.js, and PostgreSQL.
+A modern Tic Tac Toe game with AI opponent powered by Google's Gemini AI. Built with vanilla JavaScript and serverless functions.
 
 ## ✨ Features
 
@@ -13,13 +13,11 @@ A modern, full-featured Tic Tac Toe game with AI opponent powered by Google's Ge
 - **Medium**: Strategic gameplay with win/block detection
 - **Hard**: Advanced minimax algorithm + Gemini AI integration
 
-### Advanced Features
-- 🏆 **Persistent Leaderboard**: Track wins, losses, and draws across sessions
-- 📜 **Game History**: Review and replay past games
+### Features
 - 🎨 **Customizable Themes**: Personalize player names and colors
 - 🔊 **Sound Effects**: Audio feedback for moves, wins, and draws
-- 💾 **Database Integration**: PostgreSQL for data persistence
 - 📱 **Responsive Design**: Works seamlessly on desktop and mobile
+- 💾 **Local Storage**: Saves your settings locally
 
 ## 🚀 Live Demo
 
@@ -33,28 +31,21 @@ Visit the live deployment: [https://tic-tac-toe-gemini.vercel.app/](https://tic-
 - **CSS Grid**: Responsive game board layout
 
 ### Backend
-- **Node.js**: Runtime environment
-- **Express.js**: Web server framework
-- **TypeScript**: Type-safe server code
-
-### Database
-- **PostgreSQL**: Relational database
-- **Drizzle ORM**: Type-safe database operations
-- **Neon**: Serverless PostgreSQL hosting
+- **Vercel Functions**: Serverless API endpoints
+- **TypeScript**: Type-safe code
 
 ### AI Integration
-- **Google Gemini API**: Advanced AI opponent
+- **Google Gemini API**: Advanced AI opponent (hard mode)
+- **Minimax Algorithm**: Built-in AI for offline play
 
 ### Deployment
 - **Vercel**: Serverless hosting platform
-- **Vercel Functions**: API endpoints
 
 ## 📦 Installation
 
 ### Prerequisites
 - Node.js 18+ installed
-- PostgreSQL database (or Neon account)
-- Gemini API key
+- Gemini API key (optional - falls back to minimax AI)
 
 ### Setup Steps
 
@@ -69,28 +60,24 @@ Visit the live deployment: [https://tic-tac-toe-gemini.vercel.app/](https://tic-
    npm install
    ```
 
-3. **Configure environment variables**
+3. **Configure environment variables** (optional)
    ```bash
    cp .env.example .env
    ```
    
-   Edit `.env` and add your credentials:
+   Edit `.env` and add your Gemini API key:
    ```
-   DATABASE_URL=your_postgresql_connection_string
    GEMINI_API_KEY=your_gemini_api_key
    ```
+   
+   Note: The game works without the API key using built-in AI
 
-4. **Setup database**
-   ```bash
-   npm run db:push
-   ```
-
-5. **Run development server**
+4. **Run development server**
    ```bash
    npm run dev
    ```
 
-6. **Open in browser**
+5. **Open in browser**
    ```
    http://localhost:5000
    ```
@@ -100,9 +87,8 @@ Visit the live deployment: [https://tic-tac-toe-gemini.vercel.app/](https://tic-
 ### From Vercel Dashboard
 
 1. **Import your GitHub repository** to Vercel
-2. **Add environment variables** in Vercel project settings:
-   - `DATABASE_URL`
-   - `GEMINI_API_KEY`
+2. **Add environment variable** (optional) in Vercel project settings:
+   - `GEMINI_API_KEY` - Your Gemini API key
 3. **Deploy** - Vercel will automatically build and deploy
 
 ### From CLI
@@ -114,8 +100,7 @@ npm i -g vercel
 # Deploy
 vercel
 
-# Add environment variables
-vercel env add DATABASE_URL
+# Add environment variable (optional)
 vercel env add GEMINI_API_KEY
 
 # Deploy to production
@@ -150,59 +135,23 @@ Access the Settings panel to customize:
 - Player colors (4 color options per player)
 - All settings are saved to local storage
 
-## 📊 Database Schema
-
-### Players Table
-```sql
-CREATE TABLE players (
-  id SERIAL PRIMARY KEY,
-  name TEXT NOT NULL,
-  color TEXT DEFAULT '#ff6b6b',
-  games_played INTEGER DEFAULT 0,
-  wins INTEGER DEFAULT 0,
-  losses INTEGER DEFAULT 0,
-  draws INTEGER DEFAULT 0,
-  created_at TIMESTAMP DEFAULT NOW()
-);
-```
-
-### Game History Table
-```sql
-CREATE TABLE game_history (
-  id SERIAL PRIMARY KEY,
-  game_mode TEXT NOT NULL,
-  difficulty TEXT,
-  player1_name TEXT NOT NULL,
-  player2_name TEXT NOT NULL,
-  winner TEXT,
-  moves JSONB NOT NULL,
-  final_board JSONB NOT NULL,
-  played_at TIMESTAMP DEFAULT NOW()
-);
-```
-
-## 🔧 API Endpoints
+## 🔧 API Endpoint
 
 ### POST `/api/ai-move`
 Get AI's next move
 ```json
 {
   "board": ["X", "", "O", ...],
-  "difficulty": "hard"
+  "difficulty": "easy" | "medium" | "hard"
 }
 ```
 
-### GET `/api/leaderboard`
-Retrieve top 10 players
-
-### POST `/api/save-game`
-Save game result to database
-
-### GET `/api/game-history`
-Get last 20 games
-
-### GET `/api/game/:id`
-Get specific game for replay
+Response:
+```json
+{
+  "move": 4
+}
+```
 
 ## 🤝 Contributing
 
