@@ -21,9 +21,5 @@
       "source": "/api/game/:id",
       "destination": "/api/database?action=game&id=:id"
     }
-  ],
-  "env": {
-    "DATABASE_URL": "@database_url",
-    "GEMINI_API_KEY": "@gemini_api_key"
-  }
+  ]
 }
