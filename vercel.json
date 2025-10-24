@@ -1,0 +1,29 @@
+{
+  "version": 2,
+  "rewrites": [
+    {
+      "source": "/api/ai-move",
+      "destination": "/api/ai-move"
+    },
+    {
+      "source": "/api/leaderboard",
+      "destination": "/api/database?action=leaderboard"
+    },
+    {
+      "source": "/api/save-game",
+      "destination": "/api/database?action=save-game"
+    },
+    {
+      "source": "/api/game-history",
+      "destination": "/api/database?action=game-history"
+    },
+    {
+      "source": "/api/game/:id",
+      "destination": "/api/database?action=game&id=:id"
+    }
+  ],
+  "env": {
+    "DATABASE_URL": "@database_url",
+    "GEMINI_API_KEY": "@gemini_api_key"
+  }
+}
